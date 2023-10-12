@@ -5,7 +5,7 @@ import { Button, Image } from "antd";
 import ImageBanner from "../image/banner_vstep.png";
 
 function MockTest() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState([]);
   const navigate = useNavigate();
   const handleGetData = () => {
     getAllExam().then((res) => {
