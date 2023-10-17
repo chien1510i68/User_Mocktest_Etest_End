@@ -3,6 +3,7 @@ import FormExam from './page/FormExam';
 import MockTest from './page/MockTest';
 import DetailExamresults from "./page/DetailExamresults";
 import TableExamResults from "./page/TableExamResults";
+import PageMocktest from "./page/PageMocktest";
 
 import PageShowListExam from "./page/PageShowListExam";
 export const router = createBrowserRouter([
@@ -11,8 +12,12 @@ export const router = createBrowserRouter([
     element: <FormExam />,
   },
   {
-    path: "/",
+    path: "/mocktest",
     element: <MockTest />,
+  },
+  {
+    path : "/" ,
+    element : <PageMocktest/>
   },
   {
     path : "/detail-results/:resultId" , 
