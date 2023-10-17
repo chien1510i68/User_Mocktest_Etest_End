@@ -13,11 +13,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/mocktest",
-    element: <MockTest />,
+    element : <PageMocktest/>
   },
   {
     path : "/" ,
-    element : <PageMocktest/>
+    element: <MockTest />,
   },
   {
     path : "/detail-results/:resultId" , 
