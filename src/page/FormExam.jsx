@@ -1,4 +1,4 @@
-import {CheckCircleFilled } from "@ant-design/icons";
+import { CheckCircleFilled } from "@ant-design/icons";
 
 import {
   BackTop,
@@ -18,6 +18,7 @@ import { createUserResponse, getSectionByExamIdAndType } from "../api/exam";
 function FormExam(props) {
   const [data, setData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpenModalEmail, setIsOpenModalEmail] = useState(false);
   const { examId } = useParams();
   const [type, setType] = useState("listening");
   const [isDisableListening, setIsDisableListening] = useState(false);
@@ -26,17 +27,24 @@ function FormExam(props) {
   const [listQuestion, setListQuestion] = useState([]);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  const [idResults , setIdResults] = useState(null)
+  const [idResults, setIdResults] = useState(null);
 
-  // State để lưu các lựa chọn của người dùng
   const [userChoices, setUserChoices] = useState({
     listening: [],
     reading: [],
     writing: [],
   });
 
+  const validateMessages = {
+    required: "${label} is required!",
+    types: {
+      email: "${label} is not a valid email!",
+      number: "${label} is not a valid number!",
+    }
+  };
+
   const handleGetData = () => {
-    getSectionByExamIdAndType(examId, type).then((res) => {
+    getSectionByExamIdAndType({ id: examId, type: type }).then((res) => {
       console.log(res.data.data.items);
       setData(res.data.data.items);
     });
@@ -82,7 +90,7 @@ function FormExam(props) {
       });
     }
   };
-  const handleWritingSubmit = () => {
+  const handleWritingSubmit = (values) => {
     if (checkSuccess(type)) {
       onConfirm(
         "userChoicesWriting",
@@ -98,24 +106,31 @@ function FormExam(props) {
       JSON.parse(localStorage.getItem("userChoicesReading")),
       JSON.parse(localStorage.getItem("userChoicesWriting"))
     );
+    const email = JSON.parse(localStorage.getItem("email"));
 
     createUserResponse({
       exam_id: examId,
       user_id: 19,
       responseUsers: listChoice,
+      email : email 
     })
       .then((res) => {
         console.log(res);
         if (res.data.success === true) {
           setIsModalOpen(true);
-          notification.success({ message: res.data.data.point });
-          setIdResults(res.data.data.id)
+          // notification.success({ message: res.data.data.point });
+          setIdResults(res.data.data.id);
           // navigate()
         }
       })
       .catch((err) => {
         console.log(err);
       });
+    if (!isEmail) {
+      localStorage.setItem("email", JSON.stringify(values.user.email));
+      console.log(values.user.email);
+    }
+    setIsOpenModalEmail(false);
   };
 
   const checkSuccess = (type) => {
@@ -177,6 +192,14 @@ function FormExam(props) {
     }
   };
 
+  const isEmail = localStorage.getItem("email") !== null ? true : false;
+  const hadnleModalEmail = () => {
+    if (isEmail) {
+      handleWritingSubmit();
+    } else {
+      setIsOpenModalEmail(true);
+    }
+  };
   return (
     <div className="max-w-[1400px] mx-auto">
       {/* <Button onClick={handleTest}>Click me </Button> */}
@@ -239,7 +262,9 @@ function FormExam(props) {
 
         <Button
           className="hover:bg-teal-500 font-semibold "
-          onClick={handleWritingSubmit}
+          // onClick={handleWritingSubmit}
+
+          onClick={hadnleModalEmail}
           htmlType="submit"
         >
           Nộp bài
@@ -352,7 +377,7 @@ function FormExam(props) {
         ---------- Kết thúc phần thi {type} ----------
       </h2>
 
-      <Modal open={isModalOpen} footer={null} >
+      <Modal open={isModalOpen} footer={null}>
         <div className="text-center">
           <h2 className="text-center text-red-800 font-medium text-xl">
             Chúc mừng bạn đã hoàn thành xong bài thi{" "}
@@ -361,17 +386,64 @@ function FormExam(props) {
           <CheckCircleFilled className="text-7xl text-green-500 block" />
 
           {/* </p> */}
-          <p className="my-5"> 
+          <p className="my-5">
             Hãy ôn tập nhiều hơn để đạt kết quả tốt hơn trong lần thi tiếp theo
           </p>
           <div className=" flex items-center justify-end ">
-            <Button onClick={()=> {
-              navigate(`/detail-results/${idResults}`)
-            }}> Xem kết quả </Button>
+            <Button
+              onClick={() => {
+                navigate(`/detail-results/${idResults}`);
+              }}
+            >
+              {" "}
+              Xem kết quả{" "}
+            </Button>
             <Button className="ml-5">Tiếp tục thi</Button>
           </div>
         </div>
       </Modal>
+
+      {!isEmail && (
+        <Modal
+          open={isOpenModalEmail}
+          footer={null}
+          validateMessages={validateMessages}
+        >
+          <h2 className="text-orange-500 font-medium text-center text-xl my-5">
+            Nhập vào thông tin email của bạn{" "}
+          </h2>
+          <Form
+            name="nest-messages"
+            onFinish={handleWritingSubmit}
+            style={{
+              maxWidth: 600,
+            }}
+            validateMessages={validateMessages}
+          >
+            <Form.Item
+              name={["user", "email"]}
+              label="Email"
+              rules={[
+                {
+                  type: "email",
+                  required: true,
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item>
+              <Button
+                className="bg-orange-500 ml-auto block hover:opacity-80"
+                htmlType="submit"
+              >
+                Nộp bài
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      )}
     </div>
   );
 }

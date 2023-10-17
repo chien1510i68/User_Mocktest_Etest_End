@@ -53,7 +53,7 @@ function DetailExamresults() {
                   return (
                     <p
                       key={answer.id}
-                      className={`col-span-1 ${userAnswerIsCorrect ? 'text-green-500' : (item.choiceUser?.includes(answer.answerKey) ? 'text-red-500' : '')}`}
+                      className={`col-span-1 ${userAnswerIsCorrect ? 'text-green-500 font-medium' : (item.choiceUser?.includes(answer.answerKey) ? 'text-[#ff0000] font-medium' : '')}`}
                     >
                       {answer.answer}
                     </p>
@@ -62,11 +62,11 @@ function DetailExamresults() {
               </div>
               {(!correct && item.choiceUser?.length > 0) && (
                 <div>
-                  <p className="font-medium text-blue-600">Câu trả lời đúng:</p>
+                  <p className="font-medium text-[#0014ff]">Câu trả lời đúng:</p>
                   {item?.question?.listAnswer
                     ?.filter((answer) => item.choiceCorrect?.includes(answer.answerKey))
                     ?.map((correctAnswer) => (
-                      <p key={correctAnswer.id} className="font-medium text-blue-600">{correctAnswer.answer}</p>
+                      <p key={correctAnswer.id} className="font-medium text-[#0014ff]">{correctAnswer.answer}</p>
                     ))}
                 </div>
               )}

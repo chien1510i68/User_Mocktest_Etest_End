@@ -4,6 +4,7 @@ import MockTest from './page/MockTest';
 import DetailExamresults from "./page/DetailExamresults";
 import TableExamResults from "./page/TableExamResults";
 
+import PageShowListExam from "./page/PageShowListExam";
 export const router = createBrowserRouter([
   {
     path: "exam/:examId",
@@ -21,6 +22,11 @@ export const router = createBrowserRouter([
   {
     path : "/all" ,
     element : <TableExamResults/>
+  },
+  {
+    path : "/exam/all",
+    element : <PageShowListExam/>
   }
+
  
 ]);

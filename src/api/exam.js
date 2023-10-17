@@ -1,23 +1,23 @@
-import request  from "./request.js";
+import request from "./request.js";
 
 export const getExamById = (id) => {
-  return request.get(`/mocktest/exam/${id}`);
+  return request.get(`/client/exam/${id}`);
 };
 
-export const getAllExam = () =>{
-   return request.get("mocktest/exam/");
-}
+export const getAllExam = () => {
+  return request.get("client/exam/all");
+};
 
-export const getSectionByExamIdAndType = (id , type) =>{
-    return request.get(`mocktest/exam/${id}/${type}`);
-}
-export const createUserResponse  = (data) =>{
-    return request.post("mocktest/userresponse/add" , data );
-}
-export const detailExamResults = (id) =>{
-  return request.get(`mocktest/results/${id}`)
-}
+export const getSectionByExamIdAndType = (data) => {
+  return request.post("client/exam/detail", data);
+};
+export const createUserResponse = (data) => {
+  return request.post("client/response/add", data);
+};
+export const detailExamResults = (id) => {
+  return request.get(`client/results/${id}`);
+};
 
-export const getListUserResults  = (id) =>{
-  return request.get(`mocktest/results/user/${id}`)
-}
+export const getListUserResults = (data) => {
+  return request.post("client/result/all" , data);
+};

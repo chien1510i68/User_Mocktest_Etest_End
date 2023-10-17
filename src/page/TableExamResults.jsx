@@ -8,7 +8,8 @@ const TableExamResults = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    getListUserResults(19)
+  const email = JSON.parse(localStorage.getItem("email")) ; 
+    getListUserResults({email : email })
       .then((res) => {
         console.log(res.data.data.items);
         setData(res.data.success === true ? res.data.data.items : null);

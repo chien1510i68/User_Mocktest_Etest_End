@@ -14,7 +14,7 @@ axios.interceptors.request.use((req) => {
     //Noi 2 url voi nhau
     const jwt = Cookies.get("jwt")
     const newUrl = base_url + req.url
-    const Authorization = login_path === req.url ? undefined : `Bearer ${jwt}`
+    const Authorization = (login_path === req.url || req.url.startsWith("client/"))  ? undefined : `Bearer ${jwt}`
     return{
         ...req,
         url: newUrl,
