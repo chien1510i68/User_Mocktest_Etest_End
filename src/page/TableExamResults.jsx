@@ -22,13 +22,13 @@ const TableExamResults = () => {
   return (
     <>
       <Table dataSource={data}>
-        <Column title="Tên bài thi " dataIndex="nameExam" key="nameExam" />
-        <Column title="Điểm" dataIndex="point" key="point" />
-        <Column title="Ngày thi" dataIndex="createDate" key="createDate" />
-        <Column title="Thời gian thi" dataIndex="time" key="time" />
-        <Column title="Nhận xét của giáo viên " dataIndex="comment" key="comment" />
+        <Column align="center" title="Tên bài thi " dataIndex="nameExam" key="nameExam" />
+        <Column align="center" title="Điểm" dataIndex="point" key="point" />
+        <Column align="center" title="Ngày thi" dataIndex="createDate" key="createDate" />
+        <Column align="center" title="Thời gian thi" dataIndex="time" key="time" />
+        <Column align="center" title="Nhận xét của giáo viên " dataIndex="comment" key="comment" />
 
-        <Column
+        <Column align="center"
           title="Action"
           key="action"
           render={(_, record) => (

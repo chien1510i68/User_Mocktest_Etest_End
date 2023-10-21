@@ -10,6 +10,7 @@ import {
   Popconfirm,
   Radio,
   notification,
+  Audio,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -40,13 +41,13 @@ function FormExam(props) {
     types: {
       email: "${label} is not a valid email!",
       number: "${label} is not a valid number!",
-    }
+    },
   };
 
   const handleGetData = () => {
     getSectionByExamIdAndType({ id: examId, type: type }).then((res) => {
-      console.log(res.data.data.items);
-      setData(res.data.data.items);
+      // console.log(res.data.data.items);
+      setData(res?.data?.data?.items);
     });
   };
 
@@ -112,7 +113,7 @@ function FormExam(props) {
       exam_id: examId,
       user_id: 19,
       responseUsers: listChoice,
-      email : email 
+      email: email,
     })
       .then((res) => {
         console.log(res);
@@ -291,12 +292,32 @@ function FormExam(props) {
       ))}
       {data?.map((section, index) => (
         <>
-          <h2 className="mx-10 my-7 font-medium">{section.description}</h2>
+          {/* <h2 className="mx-10 my-7 font-medium">{section.description}</h2> */}
+
+          {/* <h2>{section?.file}</h2> */}
+
+          {section?.description?.startsWith("https") ? (
+            <audio controls>
+              <source src={section.description} type="audio/mp3" />
+            </audio>
+          ) : (
+            <h2 className="font-medium text-lg">Require : {section?.description}</h2>
+          )}
+          {section?.file?.startsWith("https") && (
+            <audio controls className="my-5"> 
+              <source  src={section.file} type="audio/mp3" />
+            </audio>
+          )}
           <Form layout="vertical" key={index}>
             {section?.questions.map((question, questionIndex) => (
               <>
                 <h2 className="font-medium text-base">
                   Câu hỏi số {questionIndex + 1} : {question.content}
+                  {question?.description?.startsWith("https") && (
+                    <audio controls>
+                      <source src={question.description} type="audio/mp3" />
+                    </audio>
+                  )}
                 </h2>
                 {question.questionType === "Single_answer" && (
                   <Form.Item className="mx-10" key={question.id}>

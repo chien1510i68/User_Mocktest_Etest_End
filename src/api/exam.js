@@ -1,3 +1,4 @@
+import { ExceptionMap } from "antd/es/result/index.js";
 import request from "./request.js";
 
 export const getExamById = (id) => {
@@ -21,3 +22,7 @@ export const detailExamResults = (id) => {
 export const getListUserResults = (data) => {
   return request.post("client/result/all" , data);
 };
+
+export const getListExamBuServiceUser = (id) =>{
+  return request.get(`client/examService/${id}`);
+}

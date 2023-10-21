@@ -32,6 +32,4 @@ export const router = createBrowserRouter([
     path : "/exam/all",
     element : <PageShowListExam/>
   }
-
- 
 ]);
