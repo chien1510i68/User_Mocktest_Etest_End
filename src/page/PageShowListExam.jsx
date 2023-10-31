@@ -1,12 +1,14 @@
 import { Image, Space, Table } from "antd";
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import imageBanner from "../image/toeic_luu_y.png";
 import Column from "antd/es/table/Column";
 function PageShowListExam(props) {
   const location = useLocation();
+  const navigate = useNavigate();
   const data = location.state;
-  console.log("Danh sach cac du lieu la : ", data.length);
+  console.log("Danh sach cac du lieu la : ", data?.length);
+  
   return (
     <div className="mx-auto w-[1400px]">
       {data?.length > 0 && (
@@ -45,12 +47,12 @@ function PageShowListExam(props) {
               title={<div className="text-center">Action</div>}
               key="action"
               render={(_, record) => (
-                <Link
-                  to={`/exam/${record.id}`}
-                  className="flex justify-center font-normal text-orange-500"
+                <h2
+                  onClick={()=>navigate(`/exam/${record.id}` ,{state : record.timeExam})}
+                  className="flex justify-center font-normal text-orange-500 hover:cursor-pointer"
                 >
                   Thi thử
-                </Link>
+                </h2>
               )}
             />
           </Table>

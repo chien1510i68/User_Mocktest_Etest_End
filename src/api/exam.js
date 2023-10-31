@@ -23,6 +23,6 @@ export const getListUserResults = (data) => {
   return request.post("client/result/all" , data);
 };
 
-export const getListExamBuServiceUser = (id) =>{
-  return request.get(`client/examService/${id}`);
+export const getListExamByServiceUser = (id) =>{
+  return request.get(`client/mocktest/exam/examService/${id}`);
 }

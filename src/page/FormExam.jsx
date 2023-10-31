@@ -11,11 +11,17 @@ import {
   Radio,
   notification,
   Audio,
+  message,
 } from "antd";
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { createUserResponse, getSectionByExamIdAndType } from "../api/exam";
-
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  createUserResponse,
+  getAllExam,
+  getSectionByExamIdAndType,
+} from "../api/exam";
+import Cookies from "js-cookie";
+import Countdown from "react-countdown";
 function FormExam(props) {
   const [data, setData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +35,16 @@ function FormExam(props) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [idResults, setIdResults] = useState(null);
+  const [idUser, setIdUser] = useState(null);
+  const location = useLocation();
+  const timeExam = location.state;
+  const [isPlayed , setIsPlayed] = useState(null)
+  // const timeExam = 1;
+  const initialTime = timeExam * 60;
+  const previousTimeLeft = localStorage.getItem("timeLeft");
+  const [timeLeft, setTimeLeft] = useState(
+    previousTimeLeft ? parseInt(previousTimeLeft) : initialTime
+  );
 
   const [userChoices, setUserChoices] = useState({
     listening: [],
@@ -43,7 +59,7 @@ function FormExam(props) {
       number: "${label} is not a valid number!",
     },
   };
-
+  const isEmail = localStorage.getItem("email") !== null ? true : false;
   const handleGetData = () => {
     getSectionByExamIdAndType({ id: examId, type: type }).then((res) => {
       // console.log(res.data.data.items);
@@ -53,12 +69,50 @@ function FormExam(props) {
 
   useEffect(() => {
     handleGetData();
+    
   }, [type]);
 
   const onConfirm = (key, value, type, typeDisable) => {
     localStorage.setItem(key, JSON.stringify(value));
     setType(type);
     typeDisable(true);
+  };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (timeLeft > 0) {
+        setTimeLeft(timeLeft - 1);
+        localStorage.setItem("timeLeft", timeLeft - 1);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [timeLeft]);
+
+  // Xóa trạng thái trong Local Storage sau khi sử dụng
+  useEffect(() => {
+    if (previousTimeLeft) {
+      localStorage.removeItem("timeLeft");
+    }
+    const userId = Cookies.get("id");
+    if (userId != null) {
+      setIdUser(userId);
+    }else{
+      notification.error({message : "Không có id user"})
+    }
+  }, []);
+
+  const renderer = ({ hours, minutes, seconds }) => {
+    return (
+      <div>
+        <h1 className="font-medium text-lg text-orange-500">
+          Thời gian còn lại : {hours.toString().padStart(2, "0")}:
+          {minutes.toString().padStart(2, "0")}:
+          {seconds.toString().padStart(2, "0")}
+        </h1>
+      </div>
+    );
   };
   const handleListeningSubmit = () => {
     if (checkSuccess(type)) {
@@ -91,7 +145,7 @@ function FormExam(props) {
       });
     }
   };
-  const handleWritingSubmit = (values) => {
+  const handleWritingSubmit = () => {
     if (checkSuccess(type)) {
       onConfirm(
         "userChoicesWriting",
@@ -100,40 +154,62 @@ function FormExam(props) {
         setIsDisableWriting
       );
     }
+    handleAutosubmit()
+
+  };
+
+
+  const handleAutosubmit = () =>{
+    const isEmail = localStorage.getItem("email") !== null ? true : false;
+    if(!isEmail){
+      setIsOpenModalEmail(true);
+    }
 
     const listChoice = JSON.parse(
       localStorage.getItem("userChoicesListening")
-    ).concat(
+    )?.concat(
       JSON.parse(localStorage.getItem("userChoicesReading")),
       JSON.parse(localStorage.getItem("userChoicesWriting"))
     );
+   
     const email = JSON.parse(localStorage.getItem("email"));
 
-    createUserResponse({
+    const data = {
       exam_id: examId,
-      user_id: 19,
       responseUsers: listChoice,
       email: email,
-    })
+    };
+
+    if (idUser !== null) {
+      data.user_id = idUser;
+    }
+    createUserResponse(data)
       .then((res) => {
         console.log(res);
         if (res.data.success === true) {
           setIsModalOpen(true);
           // notification.success({ message: res.data.data.point });
           setIdResults(res.data.data.id);
-          // navigate()
+          localStorage.removeItem('timeLeft');        
+        }else{
+          console.log(res?.data?.error);
         }
       })
       .catch((err) => {
         console.log(err);
       });
+    
+  }
+  const handleSubmitEmail = (values)=>{
+    console.log(values.user.email);
     if (!isEmail) {
       localStorage.setItem("email", JSON.stringify(values.user.email));
       console.log(values.user.email);
     }
     setIsOpenModalEmail(false);
-  };
+    handleAutosubmit()
 
+  }
   const checkSuccess = (type) => {
     const questionIds = userChoices[type].map((choice) => choice.questionId);
 
@@ -193,22 +269,46 @@ function FormExam(props) {
     }
   };
 
-  const isEmail = localStorage.getItem("email") !== null ? true : false;
+  
   const hadnleModalEmail = () => {
+    
     if (isEmail) {
       handleWritingSubmit();
     } else {
       setIsOpenModalEmail(true);
     }
   };
+
+  const handleSubmitFreeExam = () => {
+    getAllExam()
+      .then((res) => {
+        console.log(res.data.body.data.items);
+        if (res.data.body.success) {
+          // setData();
+          const data = res.data.body.data.items;
+          notification.success({ message: "Thanh cong " });
+          navigate("/exam/all", { state: data });
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+
+
+  
+
   return (
     <div className="max-w-[1400px] mx-auto">
       {/* <Button onClick={handleTest}>Click me </Button> */}
       <h2 className="text-center font-semibold text-2xl">
-        Bài thi {data?.name}
+        Bài thi {data?.name} {idUser}
       </h2>
 
       <div className="flex justify-end">
+        <Countdown date={ Date.now() + timeLeft  * 1000} renderer={renderer} onComplete={()=>handleAutosubmit()} />
+
         <Popconfirm
           placement="bottom"
           text={"Bạn có muốn chuyển sang phần thi mới"}
@@ -292,22 +392,38 @@ function FormExam(props) {
       ))}
       {data?.map((section, index) => (
         <>
-          {/* <h2 className="mx-10 my-7 font-medium">{section.description}</h2> */}
-
-          {/* <h2>{section?.file}</h2> */}
+        
+{/* 
 
           {section?.description?.startsWith("https") ? (
             <audio controls>
               <source src={section.description} type="audio/mp3" />
             </audio>
           ) : (
-            <h2 className="font-medium text-lg">Require : {section?.description}</h2>
+            <h2 className="font-medium text-lg">
+              Require : {section?.description}
+            </h2>
           )}
           {section?.file?.startsWith("https") && (
-            <audio controls className="my-5"> 
-              <source  src={section.file} type="audio/mp3" />
+            <audio controls className="my-5">
+              <source src={section.file} type="audio/mp3" />
+            </audio>
+          )} */}
+          {section?.description?.startsWith("https") ? (
+            <audio controls className="my-5">
+              <source src={section.description} type="audio/mp3" />
+            </audio>
+          ) : (
+            <h2 className="font-medium text-lg">
+              Require : {section?.description}
+            </h2>
+          )}
+          {section?.file?.startsWith("https") && (
+            <audio controls className="my-5">
+              <source src={section.file} type="audio/mp3" />
             </audio>
           )}
+
           <Form layout="vertical" key={index}>
             {section?.questions.map((question, questionIndex) => (
               <>
@@ -411,15 +527,17 @@ function FormExam(props) {
             Hãy ôn tập nhiều hơn để đạt kết quả tốt hơn trong lần thi tiếp theo
           </p>
           <div className=" flex items-center justify-end ">
-            <Button
+            {/* <Button
               onClick={() => {
                 navigate(`/detail-results/${idResults}`);
               }}
             >
               {" "}
               Xem kết quả{" "}
+            </Button> */}
+            <Button className="ml-5" onClick={handleSubmitFreeExam}>
+              Tiếp tục thi
             </Button>
-            <Button className="ml-5">Tiếp tục thi</Button>
           </div>
         </div>
       </Modal>
@@ -435,7 +553,7 @@ function FormExam(props) {
           </h2>
           <Form
             name="nest-messages"
-            onFinish={handleWritingSubmit}
+            onFinish={handleSubmitEmail}
             style={{
               maxWidth: 600,
             }}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAllExam, getListExamBuServiceUser } from "../api/exam";
+import { getAllExam, getListExamByServiceUser } from "../api/exam";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Image, notification } from "antd";
 import ImageBanner from "../image/banner_vstep.png";
@@ -26,7 +26,7 @@ function MockTest() {
 
   const handleSubmitExamByService = () => {
     const id = Cookies.get("id");
-    getListExamBuServiceUser(42)
+    getListExamByServiceUser(34)
       .then((res) => {
         
         if (res.data.success === true) {
@@ -43,7 +43,8 @@ function MockTest() {
         }
       });
   };
-  const isUserId = Cookies.get("id") !== null ?true  : false;
+  const idU = Cookies.get("id") ;
+  let isUserId = idU !== "null" ?true  : false
   return (
     <div>
       {/* <h2>this is the text</h2> */}
@@ -73,7 +74,7 @@ function MockTest() {
               Xem lịch thi thử VSTEP
             </Button>
 
-            { isUserId !== true&& (
+            { isUserId && (
               <Button
                 className="hover:bg-orange-200 hover:border-transparent hover:text-gray-200 "
                 onClick={handleSubmitExamByService}
