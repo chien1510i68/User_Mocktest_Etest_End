@@ -22,6 +22,7 @@ import {
 } from "../api/exam";
 import Cookies from "js-cookie";
 import Countdown from "react-countdown";
+import ReactAudioPlayer from "react-audio-player";
 function FormExam(props) {
   const [data, setData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +39,8 @@ function FormExam(props) {
   const [idUser, setIdUser] = useState(null);
   const location = useLocation();
   const timeExam = location.state;
-  const [isPlayed , setIsPlayed] = useState(null)
+  const [isPlayed, setIsPlayed] = useState(null);
+  const [point , setPoint] = useState(null)
   // const timeExam = 1;
   const initialTime = timeExam * 60;
   const previousTimeLeft = localStorage.getItem("timeLeft");
@@ -69,7 +71,6 @@ function FormExam(props) {
 
   useEffect(() => {
     handleGetData();
-    
   }, [type]);
 
   const onConfirm = (key, value, type, typeDisable) => {
@@ -98,8 +99,8 @@ function FormExam(props) {
     const userId = Cookies.get("id");
     if (userId != null) {
       setIdUser(userId);
-    }else{
-      notification.error({message : "Không có id user"})
+    } else {
+      notification.error({ message: "Không có id user" });
     }
   }, []);
 
@@ -154,14 +155,12 @@ function FormExam(props) {
         setIsDisableWriting
       );
     }
-    handleAutosubmit()
-
+    handleAutosubmit();
   };
 
-
-  const handleAutosubmit = () =>{
+  const handleAutosubmit = () => {
     const isEmail = localStorage.getItem("email") !== null ? true : false;
-    if(!isEmail){
+    if (!isEmail) {
       setIsOpenModalEmail(true);
     }
 
@@ -171,7 +170,7 @@ function FormExam(props) {
       JSON.parse(localStorage.getItem("userChoicesReading")),
       JSON.parse(localStorage.getItem("userChoicesWriting"))
     );
-   
+
     const email = JSON.parse(localStorage.getItem("email"));
 
     const data = {
@@ -189,27 +188,26 @@ function FormExam(props) {
         if (res.data.success === true) {
           setIsModalOpen(true);
           // notification.success({ message: res.data.data.point });
+          setPoint(res?.data?.data?.point)
           setIdResults(res.data.data.id);
-          localStorage.removeItem('timeLeft');        
-        }else{
+          localStorage.removeItem("timeLeft");
+        } else {
           console.log(res?.data?.error);
         }
       })
       .catch((err) => {
         console.log(err);
       });
-    
-  }
-  const handleSubmitEmail = (values)=>{
+  };
+  const handleSubmitEmail = (values) => {
     console.log(values.user.email);
     if (!isEmail) {
       localStorage.setItem("email", JSON.stringify(values.user.email));
       console.log(values.user.email);
     }
     setIsOpenModalEmail(false);
-    handleAutosubmit()
-
-  }
+    handleAutosubmit();
+  };
   const checkSuccess = (type) => {
     const questionIds = userChoices[type].map((choice) => choice.questionId);
 
@@ -269,9 +267,7 @@ function FormExam(props) {
     }
   };
 
-  
   const hadnleModalEmail = () => {
-    
     if (isEmail) {
       handleWritingSubmit();
     } else {
@@ -295,10 +291,6 @@ function FormExam(props) {
       });
   };
 
-
-
-  
-
   return (
     <div className="max-w-[1400px] mx-auto">
       {/* <Button onClick={handleTest}>Click me </Button> */}
@@ -306,10 +298,15 @@ function FormExam(props) {
         Bài thi {data?.name} {idUser}
       </h2>
 
-      <div className="flex justify-end">
-        <Countdown date={ Date.now() + timeLeft  * 1000} renderer={renderer} onComplete={()=>handleAutosubmit()} />
+      <div className="flex justify-between items-center gap-5">
+        <Countdown
+        className="mr-5"
+          date={Date.now() + timeLeft * 1000}
+          renderer={renderer}
+          onComplete={() => handleAutosubmit()}
+        />
 
-        <Popconfirm
+        {/* <Popconfirm
           placement="bottom"
           text={"Bạn có muốn chuyển sang phần thi mới"}
           description={`Khi chuyển sang phần thi mới câu trả lời sẽ được lưu lại và không thể quay lại phần thi ${type}`}
@@ -326,50 +323,56 @@ function FormExam(props) {
           >
             Listening
           </Button>
-        </Popconfirm>
-        <Popconfirm
-          placement="bottom"
-          text={"Bạn có muốn chuyển sang phần thi mới"}
-          description={`Khi chuyển sang phần thi mới câu trả lời sẽ được lưu lại và không thể quay lại phần thi ${type}`}
-          onConfirm={handleListeningSubmit}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button
-            className="hover:bg-teal-500 font-semibold mx-5"
-            // onClick={handleListeningSubmit}
-            disabled={isDisableReading}
+        </Popconfirm> */}
+        {type === "listening" && (
+          <Popconfirm
+            placement="bottom"
+            text={"Bạn có muốn chuyển sang phần thi mới"}
+            description={`Khi chuyển sang phần thi mới câu trả lời sẽ được lưu lại và không thể quay lại phần thi ${type}`}
+            onConfirm={handleListeningSubmit}
+            okText="Yes"
+            cancelText="No"
           >
-            Reading
-          </Button>
-        </Popconfirm>
-        <Popconfirm
-          placement="bottom"
-          text={"Bạn có muốn chuyển sang phần thi mới"}
-          description={`Khi chuyển sang phần thi mới câu trả lời sẽ được lưu lại và không thể quay lại phần thi ${type}`}
-          onConfirm={handleReadingSubmit}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button
-            className="hover:bg-teal-500 font-semibold mr-3"
-            // onClick={handleReadingSubmit}
-            onClick={handleCheckWriting}
-            disabled={isDisableWriting}
+            <Button
+              className="hover:bg-teal-500 font-semibold mx-5"
+              // onClick={handleListeningSubmit}
+              disabled={isDisableReading}
+            >
+              Chuyển tới phần thi reading
+            </Button>
+          </Popconfirm>
+        )}
+        {type === "reading" && (
+          <Popconfirm
+            placement="bottom"
+            text={"Bạn có muốn chuyển sang phần thi mới"}
+            description={`Khi chuyển sang phần thi mới câu trả lời sẽ được lưu lại và không thể quay lại phần thi ${type}`}
+            onConfirm={handleReadingSubmit}
+            okText="Yes"
+            cancelText="No"
           >
-            Writing
+            <Button
+              className="hover:bg-teal-500 font-semibold mr-3"
+              // onClick={handleReadingSubmit}
+              onClick={handleCheckWriting}
+              disabled={isDisableWriting}
+            >
+              Chuyển tới phần thi Writing
+            </Button>
+          </Popconfirm>
+        )}
+
+        {type === "writing" && (
+          <Button
+            className="hover:bg-teal-500 font-semibold "
+            // onClick={handleWritingSubmit}
+
+            onClick={hadnleModalEmail}
+            htmlType="submit"
+          >
+            Nộp bài
           </Button>
-        </Popconfirm>
-
-        <Button
-          className="hover:bg-teal-500 font-semibold "
-          // onClick={handleWritingSubmit}
-
-          onClick={hadnleModalEmail}
-          htmlType="submit"
-        >
-          Nộp bài
-        </Button>
+        )}
       </div>
       <h2 className="font-semibold text-2xl text-orange-700 my-10 uppercase">
         Phần thi {type}
@@ -392,45 +395,32 @@ function FormExam(props) {
       ))}
       {data?.map((section, index) => (
         <>
-        
-{/* 
-
           {section?.description?.startsWith("https") ? (
-            <audio controls>
+            <ReactAudioPlayer
+              muted={true}
+              autoPlay={true}
+              controls
+              className="my-5"
+            >
               <source src={section.description} type="audio/mp3" />
-            </audio>
+            </ReactAudioPlayer>
           ) : (
             <h2 className="font-medium text-lg">
               Require : {section?.description}
             </h2>
           )}
           {section?.file?.startsWith("https") && (
-            <audio controls className="my-5">
-              <source src={section.file} type="audio/mp3" />
-            </audio>
-          )} */}
-          {section?.description?.startsWith("https") ? (
-            <audio controls className="my-5">
-              <source src={section.description} type="audio/mp3" />
-            </audio>
-          ) : (
-            <h2 className="font-medium text-lg">
-              Require : {section?.description}
-            </h2>
-          )}
-          {section?.file?.startsWith("https") && (
-            <audio controls className="my-5">
+            <audio controls muted={true} className="my-5">
               <source src={section.file} type="audio/mp3" />
             </audio>
           )}
-
           <Form layout="vertical" key={index}>
             {section?.questions.map((question, questionIndex) => (
               <>
                 <h2 className="font-medium text-base">
                   Câu hỏi số {questionIndex + 1} : {question.content}
                   {question?.description?.startsWith("https") && (
-                    <audio controls>
+                    <audio muted={true} controls>
                       <source src={question.description} type="audio/mp3" />
                     </audio>
                   )}
@@ -519,24 +509,16 @@ function FormExam(props) {
           <h2 className="text-center text-red-800 font-medium text-xl">
             Chúc mừng bạn đã hoàn thành xong bài thi{" "}
           </h2>
-          {/* <p> */}
           <CheckCircleFilled className="text-7xl text-green-500 block" />
-
-          {/* </p> */}
-          <p className="my-5">
+          <h2 className="my-5 font-medium text-lg">Điểm số bạn đạt được là : {point}</h2>
+        
+          <p className="">
             Hãy ôn tập nhiều hơn để đạt kết quả tốt hơn trong lần thi tiếp theo
           </p>
           <div className=" flex items-center justify-end ">
-            {/* <Button
-              onClick={() => {
-                navigate(`/detail-results/${idResults}`);
-              }}
-            >
-              {" "}
-              Xem kết quả{" "}
-            </Button> */}
-            <Button className="ml-5" onClick={handleSubmitFreeExam}>
-              Tiếp tục thi
+           
+            <Button className="ml-5 mt-5" onClick={handleSubmitFreeExam}>
+              Tiếp tục thi 
             </Button>
           </div>
         </div>
