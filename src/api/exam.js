@@ -24,5 +24,5 @@ export const getListUserResults = (data) => {
 };
 
 export const getListExamByServiceUser = (id) =>{
-  return request.get(`client/mocktest/exam/examService/${id}`);
+  return request.get(`mocktest/exam/examService/${id}`);
 }

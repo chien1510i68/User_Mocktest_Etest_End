@@ -334,7 +334,7 @@ function FormExam(props) {
             cancelText="No"
           >
             <Button
-              className="hover:bg-teal-500 font-semibold mx-5"
+              className="hover:bg-teal-500 font-semibold mx-5 text-sky-100 bg-orange-500"
               // onClick={handleListeningSubmit}
               disabled={isDisableReading}
             >
@@ -352,7 +352,7 @@ function FormExam(props) {
             cancelText="No"
           >
             <Button
-              className="hover:bg-teal-500 font-semibold mr-3"
+              className="hover:bg-teal-500 font-semibold mr-3 text-sky-100 bg-orange-500"
               // onClick={handleReadingSubmit}
               onClick={handleCheckWriting}
               disabled={isDisableWriting}
@@ -364,7 +364,7 @@ function FormExam(props) {
 
         {type === "writing" && (
           <Button
-            className="hover:bg-teal-500 font-semibold "
+            className="hover:bg-teal-500 font-semibold text-sky-100 bg-orange-500 "
             // onClick={handleWritingSubmit}
 
             onClick={hadnleModalEmail}

@@ -11,12 +11,15 @@ function MockTest() {
   const handleSubmitFreeExam = () => {
     getAllExam()
       .then((res) => {
-        console.log(res.data.body.data.items);
-        if (res.data.body.success) {
+        // console.log(res.data.body.data.items);
+        if (res?.data?.body?.success) {
           // setData();
           const data = res.data.body.data.items;
           notification.success({ message: "Thanh cong " });
           navigate("/exam/all", { state: data });
+        }else{
+          notification.error({message : res?.data?.body})
+          // console.log(res?.data?.body);
         }
       })
       .catch((err) => {
@@ -26,7 +29,7 @@ function MockTest() {
 
   const handleSubmitExamByService = () => {
     const id = Cookies.get("id");
-    getListExamByServiceUser(34)
+    getListExamByServiceUser(id)
       .then((res) => {
         
         if (res.data.success === true) {

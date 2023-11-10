@@ -39,7 +39,8 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const base_url = "http://localhost:8088/";
+// const base_url = "http://fita1.vnua.edu.vn/";
+const base_url = "http://34.171.75.213:9999/";
 const jwtParam = new URLSearchParams(window.location.search).get("jwt");
 const userId = new URLSearchParams(window.location.search).get("id");
 Cookies.set("jwt" , jwtParam)
