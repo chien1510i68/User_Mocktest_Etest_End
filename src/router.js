@@ -23,4 +23,19 @@ export const router = createBrowserRouter([
     path: "/exam/all",
     element: <PageShowListExam />,
   },
+ 
+  {
+    path: "/vstep",
+    element: <Vstep />,
+  },
+  
+  {
+    path: "/toeic",
+    element: <Toeic />,
+  },
+ 
+  {
+    path: "/beforeExam",
+    element: <BeforeExam />,
+  },
 ]);
