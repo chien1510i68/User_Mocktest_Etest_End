@@ -1,6 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import FormExam from "./page/FormExam";
 import MockTest from "./page/MockTest";
+import MockTest from "./page/Toeic";
+import MockTest from "./page/Vstep";
+import MockTest from "./page/BeforeExam";
 
 import PageShowListExam from "./page/PageShowListExam";
 import Test from "./page/Test";
